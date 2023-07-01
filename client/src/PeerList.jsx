@@ -9,6 +9,12 @@ const PeerList = ({ socket, name }) => {
     const remote = useRef(null);
     const rtc = useRef(null);
     const peerRef = useRef(null);
+    const inputFile = useRef(null);
+    const [fileSelected, setFileSelected] = useState(null);
+    const [connected, setConnected] = useState(false);
+    const conn = useRef(null);
+    const [sourceImg, setSourceImg] = useState(null);
+
     useEffect(() => {
         const ls_name = localStorage.getItem('name');
         if (ls_name) {
@@ -28,12 +34,17 @@ const PeerList = ({ socket, name }) => {
         });
         peerRef.current = peer;
         // console.log(peerRef);
-
         peer.on('connection', conn => {
             conn.on('data', data => {
                 console.log(data);
+                if (data.fileType.includes('image')) {
+                    const bytes = new Uint8Array(data.file)
+                    setSourceImg(`data:image/png;base64,${encode(bytes)}`)
+                }
             })
         })
+        
+        
         }
         
 
@@ -100,15 +111,35 @@ const PeerList = ({ socket, name }) => {
         })
     }, [socket]);
 
-    
+    useEffect(() => {
+        if (connected) {
+            conn.current.send("hello?");
+            if (fileSelected) {
+                console.log(`Trying to send this file: ${fileSelected}`);
+                const blob = new Blob(fileSelected, {type: fileSelected[0].type})
+                console.log(blob);
+                conn.current.send({
+                    file: blob,
+                    fileType: fileSelected[0].type,
+                    fileName: fileSelected[0].name
+                });
+            }
+        }
+    }, [connected, fileSelected])
+
+    const fileWatch = (e) => {
+        setFileSelected(e.target.files)
+        console.log(fileSelected);
+    }
 
 
     const handshake = async (id) => {
         console.log(peerRef.current);
-        const conn = peerRef.current.connect(id);
+        conn.current = peerRef.current.connect(id);
         
-        conn.on('open', () => {
-            conn.send("Hey man?");
+        conn.current.on('open', () => {
+            setConnected(true);
+            inputFile.current.click();
         })
         
         console.log(`Trying to connect to ${id}`);
@@ -129,12 +160,46 @@ const PeerList = ({ socket, name }) => {
         //   socket.emit('join', {name: id, local: local.current, type: 'initial', his: localStorage.getItem('name')});
     }
 
+    const encode = input => {
+        const keyStr =
+          'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/='
+        let output = ''
+        let chr1, chr2, chr3, enc1, enc2, enc3, enc4
+        let i = 0
+      
+        while (i < input.length) {
+          chr1 = input[i++]
+          chr2 = i < input.length ? input[i++] : Number.NaN // Not sure if the index
+          chr3 = i < input.length ? input[i++] : Number.NaN // checks are needed here
+      
+          enc1 = chr1 >> 2
+          enc2 = ((chr1 & 3) << 4) | (chr2 >> 4)
+          enc3 = ((chr2 & 15) << 2) | (chr3 >> 6)
+          enc4 = chr3 & 63
+      
+          if (isNaN(chr2)) {
+            enc3 = enc4 = 64
+          } else if (isNaN(chr3)) {
+            enc4 = 64
+          }
+          output +=
+            keyStr.charAt(enc1) +
+            keyStr.charAt(enc2) +
+            keyStr.charAt(enc3) +
+            keyStr.charAt(enc4)
+        }
+        return output
+      }
+
     return (
         <>
         <h3>{localStorage.getItem('name')}</h3>
         <ul>
             {list.map((number) =>  <li onClick={() => {handshake(number)}}>{number}</li>)}
         </ul>
+            <input onChange={fileWatch} ref={inputFile} type="file" style={{ display: "none" }} accept="image/*"/>
+            {sourceImg ? <img src={sourceImg} alt="" srcset="" /> : "No File"}
+            
         </>
     )
 }

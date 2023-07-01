@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { uniqueNamesGenerator, adjectives, colors, animals } from 'unique-names-generator';
-
+import {Peer} from 'peerjs';
 const PeerList = ({ socket, name }) => {
 
     const [list, setList] = useState([]);
@@ -8,6 +8,7 @@ const PeerList = ({ socket, name }) => {
     const local = useRef(null);
     const remote = useRef(null);
     const rtc = useRef(null);
+    const peerRef = useRef(null);
     useEffect(() => {
         const ls_name = localStorage.getItem('name');
         if (ls_name) {
@@ -19,12 +20,26 @@ const PeerList = ({ socket, name }) => {
             socket.emit('my_name', {name});
 
         }
+        if (peerRef.current == null) {
+            const peer = new Peer(localStorage.getItem('name'), {
+            host: 'localhost',
+            port: 3000,
+            path: '/peerjs'
+        });
+        peerRef.current = peer;
+        // console.log(peerRef);
+
+        peer.on('connection', conn => {
+            conn.on('data', data => {
+                console.log(data);
+            })
+        })
+        }
+        
+
     }, []);
 
-    const RTCInitiate = async () => {
-        
-      }
-
+    
     socket.on('neighborList', data => {
         
     });
@@ -83,26 +98,35 @@ const PeerList = ({ socket, name }) => {
             console.log(data.list);
             setList(data.list)
         })
-    }, [socket])
+    }, [socket]);
+
+    
 
 
     const handshake = async (id) => {
+        console.log(peerRef.current);
+        const conn = peerRef.current.connect(id);
+        
+        conn.on('open', () => {
+            conn.send("Hey man?");
+        })
+        
         console.log(`Trying to connect to ${id}`);
-        const servers = {
-            iceServers: [
-              {
-                urls: ['stun:stun1.l.google.com:19302', 'stun:stun2.l.google.com:19302'],
-              },
-            ],
-            iceCandidatePoolSize: 10,
-          };
+        // const servers = {
+        //     iceServers: [
+        //       {
+        //         urls: ['stun:stun1.l.google.com:19302', 'stun:stun2.l.google.com:19302'],
+        //       },
+        //     ],
+        //     iceCandidatePoolSize: 10,
+        //   };
           
-          const currentDeviceRTC = new RTCPeerConnection(servers)
-          rtc.current = currentDeviceRTC;
-          const offer = await currentDeviceRTC.createOffer();
-          await currentDeviceRTC.setLocalDescription(new RTCSessionDescription(offer));
-          local.current = currentDeviceRTC.localDescription;
-          socket.emit('join', {name: id, local: local.current, type: 'initial', his: localStorage.getItem('name')});
+        //   const currentDeviceRTC = new RTCPeerConnection(servers)
+        //   rtc.current = currentDeviceRTC;
+        //   const offer = await currentDeviceRTC.createOffer();
+        //   await currentDeviceRTC.setLocalDescription(new RTCSessionDescription(offer));
+        //   local.current = currentDeviceRTC.localDescription;
+        //   socket.emit('join', {name: id, local: local.current, type: 'initial', his: localStorage.getItem('name')});
     }
 
     return (

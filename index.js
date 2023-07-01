@@ -1,4 +1,5 @@
 const express = require('express');
+const {ExpressPeerServer} = require('peer');
 const { uniqueNamesGenerator, adjectives, colors, animals } = require('unique-names-generator');
 
 const app = express();
@@ -12,7 +13,7 @@ var io = require('socket.io')(http, {
 });
 
 app.use(cors());
-
+app.use('/peerjs', ExpressPeerServer(http, {debug: true}))
 class PeerSignalling {
     constructor() {
         this.ips = {}

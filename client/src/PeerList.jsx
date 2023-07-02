@@ -51,14 +51,10 @@ const PeerList = ({ socket, name }) => {
     }, []);
 
     
-    socket.on('neighborList', data => {
-        
-    });
+    
 
     socket.on('my_name', data => {
-        console.log(data.name);
         localStorage.setItem('name', data.name);
-        console.log("My name: ", localStorage.getItem('name'));
     });
 
     socket.on('rtcIncoming', async data => {
@@ -99,10 +95,8 @@ const PeerList = ({ socket, name }) => {
             let set = new Set(list);
             set.add(data.name);
             const arr = Array.from(set);
-            console.log(arr);
             setList(arr)
 
-            // console.log(list, data.name, set);
         });
 
         socket.on('room_members_list', data => {
@@ -113,7 +107,6 @@ const PeerList = ({ socket, name }) => {
 
     useEffect(() => {
         if (connected) {
-            conn.current.send("hello?");
             if (fileSelected) {
                 console.log(`Trying to send this file: ${fileSelected}`);
                 const blob = new Blob(fileSelected, {type: fileSelected[0].type})
@@ -129,7 +122,6 @@ const PeerList = ({ socket, name }) => {
 
     const fileWatch = (e) => {
         setFileSelected(e.target.files)
-        console.log(fileSelected);
     }
 
 
@@ -140,9 +132,12 @@ const PeerList = ({ socket, name }) => {
         conn.current.on('open', () => {
             setConnected(true);
             inputFile.current.click();
+        });
+
+        conn.current.on('close', () => {
+            setConnected(false);
         })
         
-        console.log(`Trying to connect to ${id}`);
         // const servers = {
         //     iceServers: [
         //       {
@@ -152,14 +147,9 @@ const PeerList = ({ socket, name }) => {
         //     iceCandidatePoolSize: 10,
         //   };
           
-        //   const currentDeviceRTC = new RTCPeerConnection(servers)
-        //   rtc.current = currentDeviceRTC;
-        //   const offer = await currentDeviceRTC.createOffer();
-        //   await currentDeviceRTC.setLocalDescription(new RTCSessionDescription(offer));
-        //   local.current = currentDeviceRTC.localDescription;
-        //   socket.emit('join', {name: id, local: local.current, type: 'initial', his: localStorage.getItem('name')});
     }
 
+    // Copied from a website.
     const encode = input => {
         const keyStr =
           'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/='

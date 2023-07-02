@@ -20,22 +20,18 @@ class PeerSignalling {
     }
 
     addPeer(peer) {
-        console.log(`# Adding new peer`);
 
         if (!this.ips[peer.ip]) {
             this.ips[peer.ip] = {};
         }
 
         this.ips[peer.ip][peer.name] = peer;
-        // console.log(this.ips);
         this.reportOthers(peer.ip, peer.id);
     }
 
     reportOthers(ip, except) {
-        const name = uniqueNamesGenerator({dictionaries: [colors, animals]})
      
         
-        // io.to(ip).emit('neighborList', {name: name});
         let members_list = [];
         for (let obj in this.ips[ip]) {
             members_list.push(obj);
@@ -87,14 +83,14 @@ io.on('connection', (socket) => {
         socket.to(newIP).emit("room_update", {sid: socket.id, name: data.name});
     });
 
-    socket.on('join', data => {
-        console.log(data);
-        if (data.type == 'initial') {
-            socket.to(newIP).emit('rtcIncoming', {remote: data.local, name: data.name, his: data.his})
-        } else if (data.type == 'end') {
-            socket.to(newIP).emit('rtcEstablishing', {name: data.his, remote: data.local})
-        }
-    })
+    // socket.on('join', data => {
+    //     console.log(data);
+    //     if (data.type == 'initial') {
+    //         socket.to(newIP).emit('rtcIncoming', {remote: data.local, name: data.name, his: data.his})
+    //     } else if (data.type == 'end') {
+    //         socket.to(newIP).emit('rtcEstablishing', {name: data.his, remote: data.local})
+    //     }
+    // })
     socket.on('disconnect', (socket) => {
         console.info('socket.io disconnection', socket.id);
         // p.destroy();

@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { uniqueNamesGenerator, adjectives, colors, animals } from 'unique-names-generator';
 import {Peer} from 'peerjs';
+
 const PeerList = ({ socket, name }) => {
 
     const [list, setList] = useState([]);
@@ -11,6 +12,7 @@ const PeerList = ({ socket, name }) => {
     const peerRef = useRef(null);
     const inputFile = useRef(null);
     const [fileSelected, setFileSelected] = useState(null);
+    const [fileSizeArr, setFileSizeArr] = useState([]);
     const [connected, setConnected] = useState(false);
     const conn = useRef(null);
     const [sourceImg, setSourceImg] = useState(null);
@@ -40,8 +42,12 @@ const PeerList = ({ socket, name }) => {
         peer.on('connection', conn => {
             conn.on('data', data => {
                 if (data.fileType.includes('image')) {
-                    const bytes = new Uint8Array(data.file)
-                    setSourceImg(`data:image/png;base64,${encode(bytes)}`)
+                    const sizes = data.fileSizes;
+                    const bytes = new Uint8Array(data.file);
+                    let b = bytes.slice(0, sizes[0]);
+                    console.log(bytes);
+                    console.log(sizes);
+                    setSourceImg(`data:image/png;base64,${encode(b)}`)
                 }
             })
         })
@@ -69,7 +75,6 @@ const PeerList = ({ socket, name }) => {
         });
 
         socket.on('room_members_list', data => {
-            console.log(data.list);
             setList(data.list)
         })
     }, [socket]);
@@ -83,7 +88,8 @@ const PeerList = ({ socket, name }) => {
                 conn.current.send({
                     file: blob,
                     fileType: fileSelected[0].type,
-                    fileName: fileSelected[0].name
+                    fileName: fileSelected[0].name,
+                    fileSizes: fileSizeArr
                 });
             }
         }
@@ -91,6 +97,11 @@ const PeerList = ({ socket, name }) => {
 
     const fileWatch = (e) => {
         setFileSelected(e.target.files)
+        let fileSizes = []
+        for (let i = 0; i < e.target.files.length; i++) {
+            fileSizes.push(e.target.files[i].size);
+        }
+        setFileSizeArr(fileSizes);
     }
 
 
@@ -105,17 +116,7 @@ const PeerList = ({ socket, name }) => {
 
         conn.current.on('close', () => {
             setConnected(false);
-        })
-        
-        // const servers = {
-        //     iceServers: [
-        //       {
-        //         urls: ['stun:stun1.l.google.com:19302', 'stun:stun2.l.google.com:19302'],
-        //       },
-        //     ],
-        //     iceCandidatePoolSize: 10,
-        //   };
-          
+        });   
     }
 
     // Copied from a website.
@@ -156,8 +157,8 @@ const PeerList = ({ socket, name }) => {
         <ul>
             {list.map((number) =>  <li onClick={() => {handshake(number)}}>{number}</li>)}
         </ul>
-            <input onChange={fileWatch} ref={inputFile} type="file" style={{ display: "none" }} accept="image/*"/>
-            {sourceImg ? <img src={sourceImg} alt="" srcset="" /> : "No File"}
+            <input multiple="multiple" onChange={fileWatch} ref={inputFile} type="file" style={{ display: "none" }} accept="image/*"/>
+            {sourceImg ? <img height={'300px'} width={'300px'} src={sourceImg} alt="" srcset="" /> : "No File"}
             
         </>
     )

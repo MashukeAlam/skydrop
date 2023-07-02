@@ -15,7 +15,7 @@ const PeerList = ({ socket, name }) => {
     const [fileSizeArr, setFileSizeArr] = useState([]);
     const [connected, setConnected] = useState(false);
     const conn = useRef(null);
-    const [sourceImg, setSourceImg] = useState(null);
+    const [sourceImg, setSourceImg] = useState([]);
 
     useEffect(() => {
         const ls_name = localStorage.getItem('name');
@@ -44,10 +44,21 @@ const PeerList = ({ socket, name }) => {
                 if (data.fileType.includes('image')) {
                     const sizes = data.fileSizes;
                     const bytes = new Uint8Array(data.file);
-                    let b = bytes.slice(0, sizes[0]);
-                    console.log(bytes);
+                    let start = 0;
+                    for (let i = 0; i < sizes.length; i++) {
+                        const size = parseInt(sizes[i]);
+                        let currBytes = bytes.slice(start, start + size);
+                        console.log(start, parseInt(size));
+                        let currImgSrc = `data:image/png;base64,${encode(currBytes)}`;
+                        const newArr = sourceImg;
+                        newArr.push(currImgSrc);
+                        setSourceImg(newArr);
+                        start = start + size;
+                    }
+                    // let b = bytes.slice(0, sizes[0]);
+                    // console.log(bytes);
                     console.log(sizes);
-                    setSourceImg(`data:image/png;base64,${encode(b)}`)
+                    // setSourceImg(`data:image/png;base64,${encode(b)}`)
                 }
             })
         })
@@ -158,8 +169,7 @@ const PeerList = ({ socket, name }) => {
             {list.map((number) =>  <li onClick={() => {handshake(number)}}>{number}</li>)}
         </ul>
             <input multiple="multiple" onChange={fileWatch} ref={inputFile} type="file" style={{ display: "none" }} accept="image/*"/>
-            {sourceImg ? <img height={'300px'} width={'300px'} src={sourceImg} alt="" srcset="" /> : "No File"}
-            
+            {sourceImg.map(imgSrc => <img src={imgSrc} height={'300px'} width={'300px'} alt="" /> )}       
         </>
     )
 }

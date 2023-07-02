@@ -83,14 +83,7 @@ io.on('connection', (socket) => {
         socket.to(newIP).emit("room_update", {sid: socket.id, name: data.name});
     });
 
-    // socket.on('join', data => {
-    //     console.log(data);
-    //     if (data.type == 'initial') {
-    //         socket.to(newIP).emit('rtcIncoming', {remote: data.local, name: data.name, his: data.his})
-    //     } else if (data.type == 'end') {
-    //         socket.to(newIP).emit('rtcEstablishing', {name: data.his, remote: data.local})
-    //     }
-    // })
+    
     socket.on('disconnect', (socket) => {
         console.info('socket.io disconnection', socket.id);
         // p.destroy();

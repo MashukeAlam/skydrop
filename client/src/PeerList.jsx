@@ -1,14 +1,11 @@
 import { useEffect, useRef, useState } from "react";
-import { uniqueNamesGenerator, adjectives, colors, animals } from 'unique-names-generator';
+import { uniqueNamesGenerator, colors, animals } from 'unique-names-generator';
 import {Peer} from 'peerjs';
+import {FaMobileScreenButton} from 'react-icons/fa6'
 
 const PeerList = ({ socket, name }) => {
 
     const [list, setList] = useState([]);
-    const [html, setHTML] = useState('');
-    const local = useRef(null);
-    const remote = useRef(null);
-    const rtc = useRef(null);
     const peerRef = useRef(null);
     const inputFile = useRef(null);
     const [fileSelected, setFileSelected] = useState(null);
@@ -42,19 +39,25 @@ const PeerList = ({ socket, name }) => {
         peer.on('connection', conn => {
             conn.on('data', data => {
                 if (data.fileType.includes('image')) {
+                    setSourceImg([]);
                     const sizes = data.fileSizes;
                     const bytes = new Uint8Array(data.file);
                     let start = 0;
-                    for (let i = 0; i < sizes.length; i++) {
-                        const size = parseInt(sizes[i]);
+                    let newArr = [];
+                    sizes.forEach((s) => {
+                        const size = parseInt(s);
+                        console.log("size ", s)
                         let currBytes = bytes.slice(start, start + size);
                         console.log(start, parseInt(size));
                         let currImgSrc = `data:image/png;base64,${encode(currBytes)}`;
-                        const newArr = sourceImg;
+                        
                         newArr.push(currImgSrc);
                         setSourceImg(newArr);
                         start = start + size;
-                    }
+                        console.log(sourceImg.length);;;
+                    })
+                        
+                    
                     // let b = bytes.slice(0, sizes[0]);
                     // console.log(bytes);
                     console.log(sizes);
@@ -163,14 +166,20 @@ const PeerList = ({ socket, name }) => {
       }
 
     return (
-        <>
-        <h3>{localStorage.getItem('name')}</h3>
-        <ul>
-            {list.map((number) =>  <li onClick={() => {handshake(number)}}>{number}</li>)}
+        <div className="flex flex-col h-screen p-6 rounded-md shadow-2xl items-center space-x-1">
+        <h3 className="text-3xl text-emerald-500 font-semibold hover:text-emerald-400">You are known as {localStorage.getItem('name')}</h3>
+        <ul className="flex flex-row m-7">
+            {list.map((number) =>  (
+                <div className="parent flex flex-col justify-center items-center">
+                    <div className="rounded-full bg-emerald-200 border border-emerald-300 w-20 h-20 flex justify-center items-center hover:bg-emerald-300 cursor-pointer" onClick={() => {handshake(number)}}><FaMobileScreenButton className="h-10 w-10" /></div>
+                    <p className="m-3 text-md font-bold">{number}</p>
+                </div>
+            ))}
         </ul>
             <input multiple="multiple" onChange={fileWatch} ref={inputFile} type="file" style={{ display: "none" }} accept="image/*"/>
+            {sourceImg.length != 0 ? <p>{sourceImg.length} images are coming your way!</p> : "No Images"}
             {sourceImg.map(imgSrc => <img src={imgSrc} height={'300px'} width={'300px'} alt="" /> )}       
-        </>
+        </div>
     )
 }
 

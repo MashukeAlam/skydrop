@@ -18,7 +18,6 @@ const PeerList = ({ socket, name }) => {
     useEffect(() => {
         const ls_name = localStorage.getItem('name');
         if (ls_name) {
-            console.log("retreived from ls");
             socket.emit('my_name', {name: ls_name});
         } else {
             const name = uniqueNamesGenerator({dictionaries: [colors, animals]});
@@ -33,10 +32,8 @@ const PeerList = ({ socket, name }) => {
             path: '/peerjs'
         });
         peerRef.current = peer;
-        // console.log(peerRef);
         peer.on('connection', conn => {
             conn.on('data', data => {
-                console.log(data);
                 if (data.fileType.includes('image')) {
                     const bytes = new Uint8Array(data.file)
                     setSourceImg(`data:image/png;base64,${encode(bytes)}`)
@@ -56,39 +53,6 @@ const PeerList = ({ socket, name }) => {
     socket.on('my_name', data => {
         localStorage.setItem('name', data.name);
     });
-
-    socket.on('rtcIncoming', async data => {
-        if (data.name == localStorage.getItem('name')) {
-
-            console.log(`Connection trynna establish from ${data.his} to ${data.name}`);
-            const currentDeviceRTC = new RTCPeerConnection();
-            rtc.current = currentDeviceRTC;
-            await currentDeviceRTC.setRemoteDescription(data.remote);
-            const answer = await currentDeviceRTC.createAnswer();
-            await currentDeviceRTC.setLocalDescription(answer);
-            console.log(data.remote, currentDeviceRTC.localDescription);
-            local.current = currentDeviceRTC.localDescription
-            remote.current = currentDeviceRTC.remoteDescription
-            socket.emit('join', {his: data.name, remote: currentDeviceRTC.localDescription, type: 'end'});
-        }
-        
-    });
-
-    socket.on('rtcEstablishing', async data => {
-        console.log(data);
-        if (data.name == localStorage.getItem('name')) {
-
-            rtc.current.setRemoteDescription(data.remote);
-            remote.current = rtc.current.remoteDescription;
-            remote.on('data', (event) => {
-                event.on('message', data => {
-                    console.log(data);
-                })
-            })
-        }
-    });
-
-    
 
     useEffect(() => {
         socket.on("room_update", data => {

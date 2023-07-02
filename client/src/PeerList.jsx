@@ -29,7 +29,12 @@ const PeerList = ({ socket, name }) => {
             const peer = new Peer(localStorage.getItem('name'), {
             host: 'localhost',
             port: 3000,
-            path: '/peerjs'
+            path: '/peerjs',
+            config: {'iceServers': [
+                { url: 'stun:stun1.l.google.com:19302' },
+                { url: 'stun:stun1.l.google.com:19302'},
+                { url: 'stun:stun2.l.google.com:19302'}
+            ]}
         });
         peerRef.current = peer;
         peer.on('connection', conn => {

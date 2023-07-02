@@ -46,21 +46,21 @@ const PeerList = ({ socket, name }) => {
                     let newArr = [];
                     sizes.forEach((s) => {
                         const size = parseInt(s);
-                        console.log("size ", s)
+                        // console.log("size ", s)
                         let currBytes = bytes.slice(start, start + size);
-                        console.log(start, parseInt(size));
+                        // console.log(start, parseInt(size));
                         let currImgSrc = `data:image/png;base64,${encode(currBytes)}`;
                         
                         newArr.push(currImgSrc);
                         setSourceImg(newArr);
                         start = start + size;
-                        console.log(sourceImg.length);;;
+                        // console.log(sourceImg.length);;;
                     })
                         
                     
                     // let b = bytes.slice(0, sizes[0]);
                     // console.log(bytes);
-                    console.log(sizes);
+                    // console.log(sizes);
                     // setSourceImg(`data:image/png;base64,${encode(b)}`)
                 }
             })
@@ -96,9 +96,9 @@ const PeerList = ({ socket, name }) => {
     useEffect(() => {
         if (connected) {
             if (fileSelected) {
-                console.log(`Trying to send this file: ${fileSelected}`);
+                // console.log(`Trying to send this file: ${fileSelected}`);
                 const blob = new Blob(fileSelected, {type: fileSelected[0].type})
-                console.log(blob);
+                // console.log(blob);
                 conn.current.send({
                     file: blob,
                     fileType: fileSelected[0].type,
@@ -120,7 +120,7 @@ const PeerList = ({ socket, name }) => {
 
 
     const handshake = async (id) => {
-        console.log(peerRef.current);
+        // console.log(peerRef.current);
         conn.current = peerRef.current.connect(id);
         
         conn.current.on('open', () => {
@@ -178,7 +178,14 @@ const PeerList = ({ socket, name }) => {
         </ul>
             <input multiple="multiple" onChange={fileWatch} ref={inputFile} type="file" style={{ display: "none" }} accept="image/*"/>
             {sourceImg.length != 0 ? <p>{sourceImg.length} images are coming your way!</p> : "No Images"}
-            {sourceImg.map(imgSrc => <img src={imgSrc} height={'300px'} width={'300px'} alt="" /> )}       
+            <div className="imageContainer flex flex-row p-2 m-4">
+            {sourceImg.map(imgSrc => (
+                <div className="indiImage border border-black m-2">
+                    <img src={imgSrc} height={'300px'} width={'300px'} alt="" />
+                </div>
+            ) )}       
+
+            </div>
         </div>
     )
 }

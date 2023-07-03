@@ -1,6 +1,5 @@
 const express = require('express');
 const {ExpressPeerServer} = require('peer');
-const { uniqueNamesGenerator, adjectives, colors, animals } = require('unique-names-generator');
 
 const app = express();
 var http = require('http').Server(app);
@@ -42,7 +41,7 @@ class PeerSignalling {
 
     removePeer(peer) {
         delete this.ips[peer.ip][peer.id];
-        console.log(this.ips);
+        // console.log(this.ips);
     }
 }
 
@@ -65,7 +64,7 @@ class Peer {
 }
 
 io.on('connection', (socket) => {
-    console.info('socket.io connection', socket.request.connection.remoteAddress);
+    // console.info('socket.io connection', socket.request.connection.remoteAddress);
     const request = socket.request;
     let newIP = null;
     if (request.headers['x-forwarded-for']) {

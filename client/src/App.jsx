@@ -1,6 +1,7 @@
 import { useEffect, useState, useRef } from 'react'
 import socketIO from 'socket.io-client';
 import PeerList from './PeerList';
+import NavBar  from './NavBar';
 
 function App() {
 
@@ -8,6 +9,7 @@ function App() {
 
   return (
     <>
+      <NavBar />
       <PeerList name={name} socket={socket.current} />
     </>
   )

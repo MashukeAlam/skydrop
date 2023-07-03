@@ -27,8 +27,8 @@ const PeerList = ({ socket, name }) => {
         }
         if (peerRef.current == null) {
             const peer = new Peer(localStorage.getItem('name'), {
-                host: 'localhost',
-                port: 3000,
+                host: 'https://skydrop-4.onrender.com',
+                port: 443,
                 path: '/peerjs',
                 config: {
                     'iceServers': [

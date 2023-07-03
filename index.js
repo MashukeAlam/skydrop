@@ -79,6 +79,7 @@ io.on('connection', (socket) => {
     let p;
     socket.on('my_name', data => {
         p = new Peer(newIP, socket.id, data.name);
+        console.log(newIP, " has made the connection");
         socket.join(newIP);
         socket.to(newIP).emit("room_update", {sid: socket.id, name: data.name});
     });
@@ -92,7 +93,7 @@ io.on('connection', (socket) => {
 
 
 
-const port = 3000;
+const port = process.env.PORT | 3000;
 
 const pss = new PeerSignalling();
 

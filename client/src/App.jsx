@@ -4,7 +4,7 @@ import PeerList from './PeerList';
 
 function App() {
 
-  const socket =  useRef(socketIO.connect("https://skydrop-4.onrender.com"));
+  const socket =  useRef(socketIO.connect("https://skydrop-4.onrender.com/"));
 
   return (
     <>

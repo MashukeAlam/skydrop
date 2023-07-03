@@ -15,7 +15,7 @@ const PeerList = ({ socket, name }) => {
     const [sourceImg, setSourceImg] = useState([]);
 
     useEffect(() => {
-        document.documentElement.classList.add('dark')
+        // document.documentElement.classList.add('dark')
         const ls_name = localStorage.getItem('name');
         if (ls_name) {
             socket.emit('my_name', { name: ls_name });
@@ -27,19 +27,20 @@ const PeerList = ({ socket, name }) => {
         }
         if (peerRef.current == null) {
             const peer = new Peer(localStorage.getItem('name'), {
-                host: 'https://skydrop-4.onrender.com',
+                host: 'skydrop-4.onrender.com',
                 port: 443,
                 path: '/peerjs',
                 config: {
                     'iceServers': [
                         { url: 'stun:stun1.l.google.com:19302' },
-                        { url: 'stun:stun1.l.google.com:19302' },
-                        { url: 'stun:stun2.l.google.com:19302' }
+                        
                     ]
                 }
             });
+            console.log(peer);
             peerRef.current = peer;
             peer.on('connection', conn => {
+                console.log("hello?");
                 conn.on('data', data => {
                     if (data.fileType.includes('image')) {
                         setSourceImg([]);
@@ -123,10 +124,11 @@ const PeerList = ({ socket, name }) => {
 
 
     const handshake = async (id) => {
-        // console.log(peerRef.current);
         conn.current = peerRef.current.connect(id);
-
+        console.log(peerRef.current, conn.current);
+            
         conn.current.on('open', () => {
+            console.log("hello?");
             setConnected(true);
             inputFile.current.click();
         });

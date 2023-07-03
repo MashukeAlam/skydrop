@@ -89,7 +89,7 @@ const PeerList = ({ socket, name }) => {
             set.add(data.name);
             const arr = Array.from(set);
             setList(arr)
-
+            // console.log(data);
         });
 
         socket.on('room_members_list', data => {

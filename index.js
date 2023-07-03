@@ -8,7 +8,8 @@ const cors = require('cors');
 
 var io = require('socket.io')(http, {
     cors: {
-        origin: "http://localhost:5173"
+        // origin: "http://localhost:5173"
+        origin: "https://skydrop.onrender.com"
     }
 });
 

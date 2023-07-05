@@ -18,6 +18,7 @@ const NavBar = () => {
         }
         localStorage.setItem('theme', theme);
     }, [theme])
+    
     return (
         <div className="nav flex flex-row justify-end dark:bg-slate-800 pr-5">
             {theme != 'dark' ? <MdNightlightRound className='h-10 w-10 dark:text-white m-2' onClick={() => setTheme('dark')} /> : <FiSun className='h-10 w-10 dark:text-white m-2' onClick={() => setTheme('light')} />}

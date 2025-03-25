@@ -168,9 +168,24 @@ const PeerList = ({ socket, name }) => {
         </div>
       )}
 
-      <div class="absolute inset-y-0 left-1/3 transform -translate-x-1/2 flex items-center justify-center w-[28rem] h-[28rem] bg-green-900 rounded-full blur-[150px] transition-colors duration-700"></div>
-      <div class="absolute inset-y-0 left-1/2 transform -translate-x-1/2 flex items-center justify-center w-[24rem] h-[24rem] bg-lime-900 rounded-full blur-[150px] transition-colors duration-700"></div>
-      <div class="absolute inset-y-0 left-1/2 transform -translate-x-1/2 flex items-center justify-center w-[24rem] h-[24rem] bg-cyan-900 rounded-full blur-[150px] transition-colors duration-700"></div>
+      <div
+        style={{
+          backgroundColor: `hsl(${Math.floor(Math.random() * 360)}, 70%, 60%)`,
+        }}
+        class="absolute inset-y-0 left-1/3 transform -translate-x-1/2 flex items-center justify-center w-[28rem] h-[28rem] rounded-full blur-[150px] transition-colors duration-700"
+      ></div>
+      <div
+        style={{
+          backgroundColor: `hsl(${Math.floor(Math.random() * 360)}, 70%, 60%)`,
+        }}
+        class="absolute inset-y-0 left-1/2 transform -translate-x-1/2 flex items-center justify-center w-[24rem] h-[24rem] rounded-full blur-[150px] transition-colors duration-700"
+      ></div>
+      <div
+        style={{
+          backgroundColor: `hsl(${Math.floor(Math.random() * 360)}, 70%, 60%)`,
+        }}
+        class="absolute inset-y-0 left-1/2 transform -translate-x-1/2 flex items-center justify-center w-[24rem] h-[24rem] rounded-full blur-[150px] transition-colors duration-700"
+      ></div>
       <div class="relative max-w-xl mx-auto mt-10 p-6 backdrop-blur-lg bg-white/10 rounded-xl border border-white/20 shadow-lg">
         <h3 className="text-3xl text-emerald-500 dark:text-emerald-200 font-semibold hover:text-emerald-400">
           You are known as {localStorage.getItem("name")}

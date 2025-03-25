@@ -11,6 +11,7 @@ const server = http.createServer(app);
 // Configure CORS and origins
 const allowedOrigins = [
   'https://skydrop.onrender.com',
+  'https://skydrop.dreamjim.xyz',
   'http://localhost:5173'
 ];
 
